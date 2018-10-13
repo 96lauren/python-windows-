@@ -1,40 +1,37 @@
 #!flask/Source/python 
-import mysql.connector
-from  flask import Flask, jsonify 
-from mysql.connector import errorcode
+from  flask import Flask, jsonify,request
+from config import Config
 
-
-def mysql_conn():
-  try:
-    connection= mysql.connector.connect(
-  	 host= 'localhost',
-  	 user='root',
-  	 password= 'babydaddy1',
-  	 database='todo_list',
-  	 )
-  except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Something is wrong with your user name or password")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-       print("Database does not exist")
-    else:
-       print(err)
-    
-  return connection
-
+config = Config()
+cursor=config.get_cursor()
 app = Flask ('app')
+
 @app.route('/')
 def index():
 	return 'Miss me ?'
 
 @app.route('/user',methods=['GET']) 
 def get_users(): 
-  conn = mysql_conn()
-  cursor = conn.cursor()
+  
   cursor.execute("SELECT * FROM user")
   result = cursor.fetchall()
 
   return jsonify (result) 
+
+
+@app.route('/register', methods=['POST'])
+def register_user():
+  result =request.get_json()
+  # get data from the request object
+  name= result['name']
+  email = result['email']
+  password= result['password']
+  # Insert data to the table 
+
+  querry = "INSERT INTO user VALUES (%s,%s,%s,%s,NOW())"
+  values =(3,name, email, password)
+  cursor.execute(querry,values)
+  return jsonify(result) 
 
 
  
