@@ -10,6 +10,16 @@ app = Flask ('app')
 def index():
 	return 'Miss me ?'
 
+@app.errorhandler(404)
+def page_not_found(error):
+  result={
+  "statusCode":404,
+  "status":"failed",
+  "message":"NOT FOUND"
+  }
+  return jsonify(result)
+
+
 @app.route('/user',methods=['GET']) 
 def get_users(): 
   
